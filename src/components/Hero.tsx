@@ -40,7 +40,7 @@ export const Hero: React.FC = () => {
   const footerRef = useRef<HTMLElement>(null)
 
   const [isLoaded, setIsLoaded] = useState(false)
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false)
   const [reducedMotion, setReducedMotion] = useState(false)
 
   // Detect mobile & prefers-reduced-motion
@@ -394,7 +394,7 @@ export const Hero: React.FC = () => {
         <img
           src="/hero/hero-poster.jpg"
           alt="Geovane Gamba"
-          fetchPriority="high"
+          {...({ fetchpriority: "high" } as any)}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none ${
             isLoaded ? "opacity-0" : "opacity-100"
           } ${isMobile ? "object-[82%_center]" : "object-center"}`}
@@ -420,7 +420,7 @@ export const Hero: React.FC = () => {
           poster="/hero/hero-poster.jpg"
           muted
           playsInline
-          preload="auto"
+          preload="metadata"
           onLoadedMetadata={handleLoadedMetadata}
           className={`absolute inset-0 w-full h-full object-cover pointer-events-none ${
             isMobile ? "object-[82%_center]" : "object-center"

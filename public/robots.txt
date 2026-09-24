@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://geovane-gamba.vercel.app/sitemap.xml
