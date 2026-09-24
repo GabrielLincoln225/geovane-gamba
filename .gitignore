@@ -1,0 +1,48 @@
+# Dependencies
+node_modules
+.pnp
+.pnp.js
+
+# Production build
+dist
+dist-ssr
+
+# Local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Vercel & IDE
+.vercel
+.agent
+.agents
+.gemini
+.claude
+.codex
+.vscode
+.idea
+
+# Logs & temp files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Reference scraping files
+assets/
+white-desert-reference.html
+design-system.html
+
+# Root raw / archive files (already packaged in public/)
+*.zip
+Man_smiling_*.mp4
+Man_smiling_*.jpeg
+/hero-mobile.mp4
+/hero-poster.jpg

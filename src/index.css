@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* =====================================================================
+   WHITE DESERT DESIGN SYSTEM // FONTS & TOKENS FOR GEOVANE GAMBA (PODEMOS 20444)
+   ===================================================================== */
+
+@font-face {
+  font-family: 'Inter Tight';
+  src: url('/fonts/d97c708cfd2d2583_InterTight-VariableFont_wght.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cardinal Classic Long';
+  src: url('/fonts/a69a3cbfa4c4553f_CardinalClassicMidWeb-Regular.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cardinal Classic Long';
+  src: url('/fonts/4e023350e4844391_CardinalClassicMidWeb-Medium.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Cardinal Classic Long';
+  src: url('/fonts/68cd152e02dfcba4_CardinalClassicMidWeb-MediumIt.woff2') format('woff2');
+  font-style: italic;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Oswald';
+  src: url('/fonts/cc195073ee1c6261_Oswald-VariableFont_wght.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 200 700;
+  font-display: swap;
+}
+
+:root {
+  --wd_dark-blue: #1f2a44;
+  --wd_deep-blue: #0e1118;
+  --wd_orange: #ff7e15;
+  --wd_turqoise: #6af0ff;
+  --wd_white: #ffffff;
+  --wd_mushroom: #e9e7e1;
+  --wd_light-grey: #f3f1ec;
+  --wd_beige: #dcd8cc;
+  --wd_light-charcoal: #535353;
+  --wd_ash-blue: #2c374b;
+  --dark-bg: #090b10;
+
+  --font-sans: "Inter Tight", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Cardinal Classic Long", ui-serif, Georgia, serif;
+  --font-condensed: "Oswald", "Arial Narrow", Arial, sans-serif;
+
+  --transition-ease-out: all .3s cubic-bezier(.5,1,.89,1);
+  --transition-wd: all .45s cubic-bezier(.76,0,.24,1);
+  --transform-ease-out: transform .3s cubic-bezier(.5,1,.89,1);
+
+  --radius-sm: .25rem;
+  --radius-hover: .275rem;
+  --radius-md: .5rem;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--wd_deep-blue);
+  color: var(--wd_white);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Custom button animation behaviors from Design System */
+.btn-ds-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  position: relative;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.5, 1, 0.89, 1);
+}
+
+.btn-ds-container:hover .btn-ds-text {
+  transform: translateX(-0.35rem);
+}
+
+.btn-ds-container .btn-ds-icon {
+  opacity: 0;
+  transform: scale(0);
+  transition: all 0.3s cubic-bezier(0.5, 1, 0.89, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-ds-container:hover .btn-ds-icon {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Noise & texture subtle overlay */
+.bg-gradient-hero {
+  background: linear-gradient(
+    90deg,
+    rgba(14, 17, 24, 0.96) 0%,
+    rgba(14, 17, 24, 0.88) 32%,
+    rgba(31, 42, 68, 0.55) 48%,
+    rgba(31, 42, 68, 0) 65%
+  );
+}
+
+@media (max-width: 768px) {
+  .bg-gradient-hero {
+    background: linear-gradient(
+      180deg,
+      rgba(14, 17, 24, 0.95) 0%,
+      rgba(14, 17, 24, 0.8) 45%,
+      rgba(31, 42, 68, 0.25) 75%,
+      rgba(31, 42, 68, 0) 100%
+    );
+  }
+}
+
+/* Offset for fixed header navigation */
+[id] {
+  scroll-margin-top: 5rem;
+}
+
+/* Safe area inset for mobile bottom bar */
+.pb-safe {
+  padding-bottom: max(1rem, env(safe-area-inset-bottom, 1rem));
+}
+
+/* Lenis smooth scrolling recommended base styles */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
