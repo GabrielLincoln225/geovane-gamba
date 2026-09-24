@@ -85,7 +85,9 @@ export const Vote: React.FC = () => {
     const section = sectionRef.current
     if (!section) return
 
-    const ctx = gsap.context(() => {
+    let ctx: gsap.Context | undefined
+    const timer = setTimeout(() => {
+      ctx = gsap.context(() => {
       const tl = gsap.timeline({
         scrollTrigger: {
           trigger: section,
@@ -181,8 +183,12 @@ export const Vote: React.FC = () => {
         )
       }
     }, sectionRef)
+    }, 150)
 
-    return () => ctx.revert()
+    return () => {
+      clearTimeout(timer)
+      ctx?.revert()
+    }
   }, [])
 
   const handleShareWhatsApp = () => {

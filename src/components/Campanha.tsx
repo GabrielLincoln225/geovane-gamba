@@ -64,7 +64,9 @@ export const Campanha: React.FC = () => {
 
     if (!section || !track || isMobile) return
 
-    const ctx = gsap.context(() => {
+    let ctx: gsap.Context | undefined
+    const timer = setTimeout(() => {
+      ctx = gsap.context(() => {
       // Horizontal scrub timeline for desktop
       const totalCards = CAMPANHA_DATA.length
       // Calculate how far to translate the track
@@ -96,8 +98,12 @@ export const Campanha: React.FC = () => {
         ease: "none",
       })
     }, sectionRef)
+    }, 150)
 
-    return () => ctx.revert()
+    return () => {
+      clearTimeout(timer)
+      ctx?.revert()
+    }
   }, [isMobile])
 
   return (

@@ -17,26 +17,27 @@ gsap.registerPlugin(ScrollTrigger)
 export const App: React.FC = () => {
   useEffect(() => {
     const prefersReduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
-
     let lenis: Lenis | undefined
 
-    if (!prefersReduced) {
-      lenis = new Lenis({
-        duration: 1.1,
-        easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-        smoothWheel: true,
-      })
+    const timer = setTimeout(() => {
+      if (!prefersReduced) {
+        lenis = new Lenis({
+          duration: 1.1,
+          easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+          smoothWheel: true,
+        })
 
-      // Seamless integration between Lenis & ScrollTrigger
-      lenis.on("scroll", ScrollTrigger.update)
+        // Seamless integration between Lenis & ScrollTrigger
+        lenis.on("scroll", ScrollTrigger.update)
 
-      const updateTicker = (time: number) => {
-        lenis?.raf(time * 1000)
+        const updateTicker = (time: number) => {
+          lenis?.raf(time * 1000)
+        }
+
+        gsap.ticker.add(updateTicker)
+        gsap.ticker.lagSmoothing(0)
       }
-
-      gsap.ticker.add(updateTicker)
-      gsap.ticker.lagSmoothing(0)
-    }
+    }, 120)
 
     // ScrollTrigger.refresh() once all images and fonts have loaded
     const handleLoad = () => {
@@ -48,6 +49,7 @@ export const App: React.FC = () => {
     })
 
     return () => {
+      clearTimeout(timer)
       window.removeEventListener("load", handleLoad)
       if (lenis) {
         lenis.destroy()

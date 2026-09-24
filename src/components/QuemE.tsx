@@ -26,7 +26,9 @@ export const QuemE: React.FC = () => {
     const section = sectionRef.current
     if (!section) return
 
-    const ctx = gsap.context(() => {
+    let ctx: gsap.Context | undefined
+    const timer = setTimeout(() => {
+      ctx = gsap.context(() => {
       // 1. Image reveal with clip-path + parallax
       if (imageWrapperRef.current && imageRef.current) {
         gsap.fromTo(
@@ -146,8 +148,12 @@ export const QuemE: React.FC = () => {
         )
       }
     }, sectionRef)
+    }, 150)
 
-    return () => ctx.revert()
+    return () => {
+      clearTimeout(timer)
+      ctx?.revert()
+    }
   }, [])
 
   return (

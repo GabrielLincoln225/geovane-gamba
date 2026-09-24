@@ -60,9 +60,9 @@ export const Pilares: React.FC = () => {
     const section = sectionRef.current
     const stemPath = stemPathRef.current
 
-    if (!section) return
-
-    const ctx = gsap.context(() => {
+    let ctx: gsap.Context | undefined
+    const timer = setTimeout(() => {
+      ctx = gsap.context(() => {
       if (!isMobile && stemPath) {
         // Calculate exact length of the vertical stem line
         const totalStemLength = stemPath.getTotalLength()
@@ -340,8 +340,12 @@ export const Pilares: React.FC = () => {
         })
       }
     }, sectionRef)
+    }, 150)
 
-    return () => ctx.revert()
+    return () => {
+      clearTimeout(timer)
+      ctx?.revert()
+    }
   }, [isMobile])
 
   return (
