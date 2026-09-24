@@ -40,11 +40,11 @@ export const App: React.FC = () => {
 
     // ScrollTrigger.refresh() once all images and fonts have loaded
     const handleLoad = () => {
-      ScrollTrigger.refresh()
+      requestAnimationFrame(() => ScrollTrigger.refresh())
     }
     window.addEventListener("load", handleLoad)
     document.fonts?.ready?.then(() => {
-      ScrollTrigger.refresh()
+      requestAnimationFrame(() => ScrollTrigger.refresh())
     })
 
     return () => {
