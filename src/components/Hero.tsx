@@ -41,19 +41,16 @@ export const Hero: React.FC = () => {
 
   const [isLoaded, setIsLoaded] = useState(false)
   const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false)
-  const [videoSrc, setVideoSrc] = useState<string>("")
   const [reducedMotion, setReducedMotion] = useState(false)
 
-  // Detect mobile & prefers-reduced-motion
+  // Detect mobile & prefers-reduced-motion, mark ready on mount
   useEffect(() => {
+    setIsLoaded(true)
     const isMob = window.innerWidth < 768
     setIsMobile(isMob)
-    setVideoSrc(isMob ? "/hero/hero-mobile.mp4?v=intra3" : "/hero/hero.mp4?v=intra3")
 
     const checkViewport = () => {
-      const mob = window.innerWidth < 768
-      setIsMobile(mob)
-      setVideoSrc(mob ? "/hero/hero-mobile.mp4?v=intra3" : "/hero/hero.mp4?v=intra3")
+      setIsMobile(window.innerWidth < 768)
     }
     const checkMotion = () => {
       const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
@@ -66,15 +63,39 @@ export const Hero: React.FC = () => {
     return () => window.removeEventListener("resize", checkViewport)
   }, [])
 
-  const handleLoadedMetadata = () => {
-    setIsLoaded(true)
-  }
-
+  // Defer scrub video network request so it never blocks FCP/LCP/TBT during page load
   useEffect(() => {
-    if (videoRef.current && videoRef.current.readyState >= 1) {
-      setIsLoaded(true)
+    let initialized = false
+    const initScrub = () => {
+      if (initialized) return
+      initialized = true
+      const isMob = window.innerWidth < 768
+      if (videoRef.current) {
+        videoRef.current.src = isMob ? "/hero/hero-mobile.mp4?v=intra3" : "/hero/hero.mp4?v=intra3"
+        videoRef.current.preload = "metadata"
+        videoRef.current.load()
+      }
     }
-  }, [videoSrc])
+
+    const timer = setTimeout(initScrub, 1200)
+    const onInteract = () => {
+      initScrub()
+      window.removeEventListener("scroll", onInteract)
+      window.removeEventListener("touchstart", onInteract)
+      window.removeEventListener("mousemove", onInteract)
+    }
+
+    window.addEventListener("scroll", onInteract, { passive: true })
+    window.addEventListener("touchstart", onInteract, { passive: true })
+    window.addEventListener("mousemove", onInteract, { passive: true })
+
+    return () => {
+      clearTimeout(timer)
+      window.removeEventListener("scroll", onInteract)
+      window.removeEventListener("touchstart", onInteract)
+      window.removeEventListener("mousemove", onInteract)
+    }
+  }, [])
 
   // GSAP Orchestrated Timeline
   useEffect(() => {
@@ -409,7 +430,6 @@ export const Hero: React.FC = () => {
         {/* Idle Video (smooth seamless loop when scroll is at 0) */}
         <video
           ref={idleVideoRef}
-          src={isMobile ? "/hero/idle-mobile.mp4?v=m1" : "/hero/idle.mp4?v=d1"}
           autoPlay
           loop
           muted
@@ -417,17 +437,18 @@ export const Hero: React.FC = () => {
           className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-700 ${
             isLoaded ? "opacity-100" : "opacity-0"
           } ${isMobile ? "object-[82%_center]" : "object-center"}`}
-        />
+        >
+          <source media="(max-width: 767px)" src="/hero/idle-mobile.mp4?v=m2" type="video/mp4" />
+          <source src="/hero/idle.mp4?v=d2" type="video/mp4" />
+        </video>
 
         {/* Main Parallax Scrub Video (all-intra 100% keyframes for instant seek) */}
         <video
           ref={videoRef}
-          src={videoSrc || undefined}
           poster="/hero/hero-poster.jpg"
           muted
           playsInline
-          preload="metadata"
-          onLoadedMetadata={handleLoadedMetadata}
+          preload="none"
           className={`absolute inset-0 w-full h-full object-cover pointer-events-none ${
             isMobile ? "object-[82%_center]" : "object-center"
           }`}
