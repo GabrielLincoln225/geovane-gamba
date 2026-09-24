@@ -46,13 +46,12 @@ export const Pilares: React.FC = () => {
   const stemPathRef = useRef<SVGPathElement>(null)
   const mobileStemRef = useRef<SVGPathElement>(null)
 
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < 1024 : false)
 
   useEffect(() => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 1024)
     }
-    checkMobile()
     window.addEventListener("resize", checkMobile)
     return () => window.removeEventListener("resize", checkMobile)
   }, [])

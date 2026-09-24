@@ -48,13 +48,12 @@ export const Campanha: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null)
   const trackRef = useRef<HTMLDivElement>(null)
   const [currentIndex, setCurrentIndex] = useState(1)
-  const [isMobile, setIsMobile] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < 1024 : false)
 
   useEffect(() => {
     const checkViewport = () => {
       setIsMobile(window.innerWidth < 1024)
     }
-    checkViewport()
     window.addEventListener("resize", checkViewport)
     return () => window.removeEventListener("resize", checkViewport)
   }, [])
