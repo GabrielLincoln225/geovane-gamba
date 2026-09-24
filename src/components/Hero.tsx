@@ -41,19 +41,25 @@ export const Hero: React.FC = () => {
 
   const [isLoaded, setIsLoaded] = useState(false)
   const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false)
+  const [videoSrc, setVideoSrc] = useState<string>("")
   const [reducedMotion, setReducedMotion] = useState(false)
 
   // Detect mobile & prefers-reduced-motion
   useEffect(() => {
+    const isMob = window.innerWidth < 768
+    setIsMobile(isMob)
+    setVideoSrc(isMob ? "/hero/hero-mobile.mp4?v=intra3" : "/hero/hero.mp4?v=intra3")
+
     const checkViewport = () => {
-      setIsMobile(window.innerWidth < 768)
+      const mob = window.innerWidth < 768
+      setIsMobile(mob)
+      setVideoSrc(mob ? "/hero/hero-mobile.mp4?v=intra3" : "/hero/hero.mp4?v=intra3")
     }
     const checkMotion = () => {
       const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)")
       setReducedMotion(mediaQuery.matches)
     }
 
-    checkViewport()
     checkMotion()
 
     window.addEventListener("resize", checkViewport)
@@ -68,7 +74,7 @@ export const Hero: React.FC = () => {
     if (videoRef.current && videoRef.current.readyState >= 1) {
       setIsLoaded(true)
     }
-  }, [])
+  }, [videoSrc])
 
   // GSAP Orchestrated Timeline
   useEffect(() => {
@@ -403,7 +409,7 @@ export const Hero: React.FC = () => {
         {/* Idle Video (smooth seamless loop when scroll is at 0) */}
         <video
           ref={idleVideoRef}
-          src="/hero/idle.mp4?v=perfect5"
+          src={isMobile ? "/hero/idle-mobile.mp4?v=m1" : "/hero/idle.mp4?v=d1"}
           autoPlay
           loop
           muted
@@ -416,7 +422,7 @@ export const Hero: React.FC = () => {
         {/* Main Parallax Scrub Video (all-intra 100% keyframes for instant seek) */}
         <video
           ref={videoRef}
-          src={isMobile ? "/hero/hero-mobile.mp4?v=intra3" : "/hero/hero.mp4?v=intra3"}
+          src={videoSrc || undefined}
           poster="/hero/hero-poster.jpg"
           muted
           playsInline
