@@ -40,6 +40,7 @@ export const Hero: React.FC = () => {
   const footerRef = useRef<HTMLElement>(null)
 
   const [isLoaded, setIsLoaded] = useState(false)
+  const [idleReady, setIdleReady] = useState(false)
   const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < 768 : false)
   const [reducedMotion, setReducedMotion] = useState(false)
 
@@ -423,7 +424,7 @@ export const Hero: React.FC = () => {
           alt="Geovane Gamba"
           {...({ fetchpriority: "high" } as any)}
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none ${
-            isLoaded ? "opacity-0" : "opacity-100"
+            idleReady ? "opacity-0" : "opacity-100"
           } ${isMobile ? "object-[82%_center]" : "object-center"}`}
         />
 
@@ -434,8 +435,9 @@ export const Hero: React.FC = () => {
           loop
           muted
           playsInline
+          onPlaying={() => setIdleReady(true)}
           className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-700 ${
-            isLoaded ? "opacity-100" : "opacity-0"
+            idleReady ? "opacity-100" : "opacity-0"
           } ${isMobile ? "object-[82%_center]" : "object-center"}`}
         >
           <source media="(max-width: 767px)" src="/hero/idle-mobile.mp4?v=m2" type="video/mp4" />
