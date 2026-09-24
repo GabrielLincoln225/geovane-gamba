@@ -215,7 +215,10 @@ export const Vote: React.FC = () => {
       <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center text-center gap-6 sm:gap-8">
         
         {/* Título: SplitText por linhas com máscara */}
-        <h2 className="font-condensed font-bold uppercase text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-[1.05]">
+        <h2
+          aria-label="Vamos plantar esse futuro juntos."
+          className="font-condensed font-bold uppercase text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-[1.05]"
+        >
           <span className="block overflow-hidden pb-1">
             <span className="vote-title-line inline-block">Vamos plantar esse</span>
           </span>

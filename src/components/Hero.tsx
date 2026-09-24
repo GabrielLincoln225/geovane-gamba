@@ -394,6 +394,7 @@ export const Hero: React.FC = () => {
         <img
           src="/hero/hero-poster.jpg"
           alt="Geovane Gamba"
+          fetchPriority="high"
           className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 pointer-events-none ${
             isLoaded ? "opacity-0" : "opacity-100"
           } ${isMobile ? "object-[82%_center]" : "object-center"}`}

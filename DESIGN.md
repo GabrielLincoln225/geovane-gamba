@@ -21,7 +21,7 @@ typography:
 
 **Creative North Star: "A Força do Nortão, com Cinematografia Premium"**
 
-A identidade visual da campanha de Geovane Gamba transmite imponência, seriedade e dinamismo. Longe do estereótipo de "design genérico de IA", o projeto exige um acabamento cinematográfico, com tipografia forte, contrastes profundos e espaçamentos generosos. O tom é de trabalho e coragem, refletindo as raízes do candidato no agronegócio de Mato Grosso.
+A identidade visual da campanha de Geovane Gamba transmite imponência, seriedade e dinamismo. Longe do estereótipo de "design genérico de IA", o projeto exige um acabamento cinematográfico, com tipografia forte, contrastes profundos e espaçamentos generosos, refletindo as raízes do candidato no agronegócio de Mato Grosso.
 
 ## Colors
 
