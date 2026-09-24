@@ -4,7 +4,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger"
 
 gsap.registerPlugin(ScrollTrigger)
 
-export const SITE_URL = "https://geovanegamba.com.br"
+export const SITE_URL = "https://geovane-gamba.vercel.app"
 export const WHATSAPP_SHARE_URL = `https://wa.me/?text=${encodeURIComponent(
   `Geovane Gamba, Deputado Estadual 20444. A força jovem do Nortão. Conheça: ${SITE_URL}`
 )}`

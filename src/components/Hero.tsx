@@ -78,23 +78,24 @@ export const Hero: React.FC = () => {
       }
     }
 
-    const timer = setTimeout(initScrub, 1200)
     const onInteract = () => {
       initScrub()
       window.removeEventListener("scroll", onInteract)
       window.removeEventListener("touchstart", onInteract)
       window.removeEventListener("mousemove", onInteract)
+      window.removeEventListener("pointerdown", onInteract)
     }
 
     window.addEventListener("scroll", onInteract, { passive: true })
     window.addEventListener("touchstart", onInteract, { passive: true })
     window.addEventListener("mousemove", onInteract, { passive: true })
+    window.addEventListener("pointerdown", onInteract, { passive: true })
 
     return () => {
-      clearTimeout(timer)
       window.removeEventListener("scroll", onInteract)
       window.removeEventListener("touchstart", onInteract)
       window.removeEventListener("mousemove", onInteract)
+      window.removeEventListener("pointerdown", onInteract)
     }
   }, [])
 
