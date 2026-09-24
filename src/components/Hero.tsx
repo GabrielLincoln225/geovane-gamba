@@ -64,6 +64,51 @@ export const Hero: React.FC = () => {
     return () => window.removeEventListener("resize", checkViewport)
   }, [])
 
+  // Ensure idle video starts playing immediately on load and stays active while user is not scrolling
+  useEffect(() => {
+    const idleVid = idleVideoRef.current
+    if (!idleVid) return
+
+    idleVid.muted = true
+    idleVid.defaultMuted = true
+
+    const startPlaying = () => {
+      if (!idleVid) return
+      const playPromise = idleVid.play()
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIdleReady(true)
+          })
+          .catch(() => {
+            // Wait for user gesture if browser policy initially blocks unmuted autoplay
+          })
+      }
+    }
+
+    startPlaying()
+
+    // Fallback: unlock playback on first touch/pointer/wheel interaction if needed
+    const unlockPlay = () => {
+      if (idleVid && idleVid.paused) {
+        startPlaying()
+      }
+      window.removeEventListener("pointerdown", unlockPlay)
+      window.removeEventListener("touchstart", unlockPlay)
+      window.removeEventListener("wheel", unlockPlay)
+    }
+
+    window.addEventListener("pointerdown", unlockPlay, { passive: true })
+    window.addEventListener("touchstart", unlockPlay, { passive: true })
+    window.addEventListener("wheel", unlockPlay, { passive: true })
+
+    return () => {
+      window.removeEventListener("pointerdown", unlockPlay)
+      window.removeEventListener("touchstart", unlockPlay)
+      window.removeEventListener("wheel", unlockPlay)
+    }
+  }, [isLoaded])
+
   // Defer scrub video network request so it never blocks FCP/LCP/TBT during page load
   useEffect(() => {
     let initialized = false
@@ -134,7 +179,7 @@ export const Hero: React.FC = () => {
     video.pause()
 
     const ctx = gsap.context(() => {
-      const pinDistance = isMobile ? "320vh" : "450vh"
+      const pinDistance = isMobile ? "240vh" : "450vh"
       const videoProxy = { currentTime: 0 }
 
       // Total timeline length: 10.0s
@@ -152,8 +197,12 @@ export const Hero: React.FC = () => {
           anticipatePin: 1,
           invalidateOnRefresh: true,
           onUpdate: (self) => {
-            if (self.progress === 0 && idleVideo) {
-              idleVideo.play().catch(() => {})
+            if (self.progress <= 0.005 && idleVideo) {
+              if (idleVideo.paused) {
+                idleVideo.play().catch(() => {})
+              }
+            } else if (self.progress > 0.05 && idleVideo && !idleVideo.paused) {
+              idleVideo.pause()
             }
           },
         },
@@ -405,7 +454,7 @@ export const Hero: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-screen overflow-hidden bg-wd-deep-blue text-white select-none"
+      className="relative w-full h-screen h-[100dvh] overflow-hidden bg-wd-deep-blue text-white select-none"
     >
       {/* Real Semantic H1 for SEO & Accessibility */}
       <h1 className="sr-only">
@@ -436,13 +485,23 @@ export const Hero: React.FC = () => {
           loop
           muted
           playsInline
+          onCanPlay={() => {
+            if (idleVideoRef.current && idleVideoRef.current.paused) {
+              idleVideoRef.current.play().catch(() => {})
+            }
+          }}
+          onLoadedData={() => {
+            if (idleVideoRef.current && idleVideoRef.current.paused) {
+              idleVideoRef.current.play().catch(() => {})
+            }
+          }}
           onPlaying={() => setIdleReady(true)}
           className={`absolute inset-0 w-full h-full object-cover pointer-events-none transition-opacity duration-700 ${
             idleReady ? "opacity-100" : "opacity-0"
           } ${isMobile ? "object-[82%_center]" : "object-center"}`}
         >
-          <source media="(max-width: 767px)" src="/hero/idle-mobile.mp4?v=m2" type="video/mp4" />
-          <source src="/hero/idle.mp4?v=d2" type="video/mp4" />
+          <source media="(max-width: 767px)" src="/hero/idle-mobile.mp4?v=flag2026" type="video/mp4" />
+          <source src="/hero/idle.mp4?v=flag2026" type="video/mp4" />
         </video>
 
         {/* Main Parallax Scrub Video (all-intra 100% keyframes for instant seek) */}
@@ -469,21 +528,21 @@ export const Hero: React.FC = () => {
       {/* -------------------------------------------------------------
           STAGE PRINCIPAL: BLOCO FINAL REFEITO SEGUNDO ESPECIFICAÇÃO
           ------------------------------------------------------------- */}
-      <div className="relative z-10 w-full h-full max-w-[1440px] mx-auto px-6 md:px-12 lg:px-16 flex flex-col justify-between py-8 md:py-10 pointer-events-none">
+      <div className="relative z-10 w-full h-full max-w-[1440px] mx-auto px-5 sm:px-8 md:px-12 lg:px-16 flex flex-col justify-between py-6 sm:py-8 md:py-10 pointer-events-none">
         
         {/* Empty top spacing (No header tags or badges permitted) */}
-        <div className="w-full h-4"></div>
+        <div className="w-full h-2 sm:h-4"></div>
 
         {/* Center Content Zone (Left 45% Desktop, Centered & Stacked on Mobile) */}
         <div className="relative w-full md:w-[48%] lg:w-[45%] flex-1 flex items-center justify-center md:justify-start">
           
           <div
             ref={finalBlockRef}
-            className="w-full flex flex-col items-center md:items-start text-center md:text-left gap-3.5 sm:gap-4 md:gap-5 opacity-0 pointer-events-auto"
+            className="w-full flex flex-col items-center md:items-start text-center md:text-left gap-2.5 sm:gap-4 md:gap-5 opacity-0 pointer-events-auto"
           >
             {/* 1. Eyebrow: pequeno, caixa alta, tracking largo */}
             <div ref={eyebrowRef} className="opacity-0">
-              <span className="font-sans text-xs sm:text-sm uppercase tracking-[0.25em] text-wd-orange font-semibold">
+              <span className="font-sans text-[11px] sm:text-xs md:text-sm uppercase tracking-[0.2em] sm:tracking-[0.25em] text-wd-orange font-semibold">
                 Deputado Estadual · Podemos
               </span>
             </div>
@@ -491,7 +550,7 @@ export const Hero: React.FC = () => {
             {/* 2. Nome: o maior elemento da tela, sans display condensada/grotesca, bold/black, caixa alta, tracking levemente negativo, clamp(3.5rem, 8vw, 7.5rem), line-height ~0.9 */}
             <h2
               ref={nameRef}
-              className="font-condensed font-black uppercase text-[clamp(2.75rem,11vw,4rem)] md:text-[clamp(3.5rem,8vw,7.5rem)] leading-[0.9] tracking-[-0.03em] text-white drop-shadow-xl flex flex-col items-center md:items-start"
+              className="font-condensed font-black uppercase text-[clamp(2.4rem,9.5vw,3.8rem)] md:text-[clamp(3.5rem,8vw,7.5rem)] leading-[0.9] tracking-[-0.03em] text-white drop-shadow-xl flex flex-col items-center md:items-start"
             >
               {renderMaskedWord("GEOVANE", "line-1")}
               {renderMaskedWord("GAMBA", "line-2")}
@@ -500,7 +559,7 @@ export const Hero: React.FC = () => {
             {/* 3. Credencial: pequena, cor de apoio, colada no nome */}
             <p
               ref={credencialRef}
-              className="font-sans text-xs sm:text-sm text-white/75 font-normal tracking-wide -mt-1 sm:-mt-2 opacity-0"
+              className="font-sans text-xs sm:text-sm text-white/75 font-normal tracking-wide -mt-0.5 sm:-mt-2 opacity-0"
             >
               Produtor rural · Alta Floresta · Nortão de MT
             </p>
@@ -508,24 +567,24 @@ export const Hero: React.FC = () => {
             {/* 4. Slogan: segundo maior destaque. A palavra "Nortão" na cor de destaque. text-wrap: balance. */}
             <p
               ref={sloganRef}
-              className="font-sans text-xl sm:text-2xl md:text-3xl lg:text-[2rem] font-bold text-white tracking-tight leading-tight [text-wrap:balance]"
+              className="font-sans text-lg sm:text-2xl md:text-3xl lg:text-[2rem] font-bold text-white tracking-tight leading-tight [text-wrap:balance]"
             >
-              <span className="slogan-word inline-block mr-2 will-change-[opacity,filter,transform]">A</span>
-              <span className="slogan-word inline-block mr-2 will-change-[opacity,filter,transform]">força</span>
-              <span className="slogan-word inline-block mr-2 will-change-[opacity,filter,transform]">jovem</span>
-              <span className="slogan-word inline-block mr-2 will-change-[opacity,filter,transform]">do</span>
+              <span className="slogan-word inline-block mr-1.5 sm:mr-2 will-change-[opacity,filter,transform]">A</span>
+              <span className="slogan-word inline-block mr-1.5 sm:mr-2 will-change-[opacity,filter,transform]">força</span>
+              <span className="slogan-word inline-block mr-1.5 sm:mr-2 will-change-[opacity,filter,transform]">jovem</span>
+              <span className="slogan-word inline-block mr-1.5 sm:mr-2 will-change-[opacity,filter,transform]">do</span>
               <span className="slogan-word slogan-word-highlight inline-block text-wd-orange will-change-[opacity,filter,transform]">Nortão</span>
             </p>
 
             {/* 5. Avatar + Urna, lado a lado */}
             <div
               ref={avatarUrnaGroupRef}
-              className="flex items-center gap-3 sm:gap-4 md:gap-5 pt-1"
+              className="flex items-center justify-center md:justify-start gap-3 sm:gap-4 md:gap-5 pt-1"
             >
               {/* Avatar circular pequeno com borda fina */}
               <div
                 ref={avatarRef}
-                className="w-13 h-13 sm:w-15 sm:h-15 md:w-16 md:h-16 rounded-full overflow-hidden border border-white/30 shadow-xl shrink-0 opacity-0 will-change-transform"
+                className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-full overflow-hidden border border-white/30 shadow-xl shrink-0 opacity-0 will-change-transform"
               >
                 <img
                   src="/hero/geovane-avatar.jpg"
@@ -542,7 +601,7 @@ export const Hero: React.FC = () => {
                 aria-label="Número 20444"
               >
                 {/* Label acima, pequeno */}
-                <span className="font-sans text-[11px] sm:text-xs uppercase tracking-wider text-white/70 font-medium mb-1">
+                <span className="font-sans text-[10px] sm:text-xs uppercase tracking-wider text-white/70 font-medium mb-1">
                   Na urna, digite
                 </span>
 
@@ -551,7 +610,7 @@ export const Hero: React.FC = () => {
                   {URNA_DIGITS.map((_, i) => (
                     <div
                       key={i}
-                      className="urna-slot relative w-8 sm:w-10 md:w-11 h-12 sm:h-14 md:h-15 rounded-[0.25rem] border border-white/20 bg-black/45 backdrop-blur-sm overflow-hidden flex items-center justify-center shadow-lg opacity-0"
+                      className="urna-slot relative w-[34px] sm:w-10 md:w-11 h-12 sm:h-14 md:h-15 rounded-[0.25rem] border border-white/20 bg-black/55 backdrop-blur-sm overflow-hidden flex items-center justify-center shadow-lg opacity-0"
                     >
                       {/* Inner vignette for electronic visor depth */}
                       <div className="pointer-events-none absolute inset-0 z-10 rounded-[0.25rem] shadow-[inset_0_2px_4px_rgba(0,0,0,0.6),inset_0_-2px_4px_rgba(0,0,0,0.6)]" />
@@ -578,13 +637,13 @@ export const Hero: React.FC = () => {
             {/* 6. Botão principal + link do Instagram na mesma linha */}
             <div
               ref={ctaGroupRef}
-              className="flex flex-wrap items-center justify-center md:justify-start gap-4 sm:gap-6 pt-2 opacity-0"
+              className="flex flex-col sm:flex-row items-center justify-center md:justify-start gap-2.5 sm:gap-6 pt-1.5 sm:pt-2 opacity-0 w-full sm:w-auto"
             >
               {/* Botão principal com hover deslizando seta para direita */}
               <button
                 type="button"
                 onClick={scrollToQuemE}
-                className="inline-flex items-center justify-center gap-2.5 bg-wd-orange hover:bg-[#d8580f] text-white px-6 sm:px-7 py-3 sm:py-3.5 rounded-[0.25rem] font-sans font-semibold text-sm sm:text-base tracking-wide transition-colors duration-200 group active:scale-[0.98] shadow-lg cursor-pointer"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 bg-wd-orange hover:bg-[#d8580f] active:bg-[#c44e0c] text-white px-6 sm:px-7 py-3 sm:py-3.5 rounded-[0.25rem] font-sans font-semibold text-sm sm:text-base tracking-wide transition-colors duration-200 group active:scale-[0.98] shadow-lg cursor-pointer min-h-[46px]"
               >
                 <span>Conheça o Geovane</span>
                 <svg
@@ -607,7 +666,7 @@ export const Hero: React.FC = () => {
                 href="https://www.instagram.com/gamba_geovane"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 font-sans text-xs sm:text-sm text-white/70 hover:text-white transition-colors duration-200 tracking-wide py-2"
+                className="inline-flex items-center justify-center gap-1.5 font-sans text-xs sm:text-sm text-white/70 hover:text-white transition-colors duration-200 tracking-wide py-2 min-h-[40px]"
               >
                 <span>Seguir @gamba_geovane</span>
                 <svg className="w-3.5 h-3.5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -623,9 +682,9 @@ export const Hero: React.FC = () => {
         {/* Rodapé: Contraste mínimo AA e indicação obrigatória de IA */}
         <footer
           ref={footerRef}
-          className="w-full flex items-center justify-center md:justify-start pt-4 border-t border-white/10 opacity-0 pointer-events-auto transition-opacity"
+          className="w-full flex items-center justify-center md:justify-start pt-3 sm:pt-4 border-t border-white/10 opacity-0 pointer-events-auto transition-opacity"
         >
-          <p className="font-sans text-xs sm:text-sm text-white/70 tracking-wide">
+          <p className="font-sans text-[11px] sm:text-xs md:text-sm text-white/70 tracking-wide text-center md:text-left">
             Conteúdo produzido com auxílio de inteligência artificial.
           </p>
         </footer>

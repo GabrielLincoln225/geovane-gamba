@@ -44,7 +44,7 @@ const PILARES_DATA: PilarItem[] = [
 export const Pilares: React.FC = () => {
   const sectionRef = useRef<HTMLElement>(null)
   const stemPathRef = useRef<SVGPathElement>(null)
-  const mobileStemRef = useRef<SVGPathElement>(null)
+  const mobileStemRef = useRef<HTMLDivElement>(null)
 
   const [isMobile, setIsMobile] = useState(() => typeof window !== "undefined" ? window.innerWidth < 1024 : false)
 
@@ -285,31 +285,31 @@ export const Pilares: React.FC = () => {
       }
 
       // =============================================================
-      // MOBILE: NATURAL DOCUMENT FLOW (NO PINNING, ZERO GLITCH)
+      // MOBILE: NATURAL DOCUMENT FLOW WITH ANIMATED TIMELINE
       // =============================================================
       if (isMobile) {
         if (mobileStemRef.current) {
-          const mLen = mobileStemRef.current.getTotalLength()
-          gsap.set(mobileStemRef.current, {
-            strokeDasharray: mLen,
-            strokeDashoffset: mLen,
-          })
-          gsap.to(mobileStemRef.current, {
-            strokeDashoffset: 0,
-            ease: "none",
-            scrollTrigger: {
-              trigger: section,
-              start: "top 70%",
-              end: "bottom 85%",
-              scrub: 0.4,
-            },
-          })
+          gsap.fromTo(
+            mobileStemRef.current,
+            { scaleY: 0 },
+            {
+              scaleY: 1,
+              transformOrigin: "top",
+              ease: "none",
+              scrollTrigger: {
+                trigger: section,
+                start: "top 65%",
+                end: "bottom 80%",
+                scrub: 0.3,
+              },
+            }
+          )
         }
 
         gsap.utils.toArray<HTMLElement>(".mobile-pilar-card").forEach((item, idx) => {
           gsap.fromTo(
             item,
-            { opacity: 0.2, y: 25 },
+            { opacity: 0.35, y: 20 },
             {
               opacity: 1,
               y: 0,
@@ -317,8 +317,8 @@ export const Pilares: React.FC = () => {
               ease: "power2.out",
               scrollTrigger: {
                 trigger: item,
-                start: "top 80%",
-                end: "bottom 60%",
+                start: "top 82%",
+                end: "bottom 55%",
                 toggleActions: "play reverse play reverse",
               },
             }
@@ -336,7 +336,7 @@ export const Pilares: React.FC = () => {
                 ease: "power2.out",
                 scrollTrigger: {
                   trigger: item,
-                  start: "top 75%",
+                  start: "top 78%",
                 },
               })
             }
@@ -648,9 +648,9 @@ export const Pilares: React.FC = () => {
         </div>
       ) : (
         /* =============================================================
-           MOBILE VIEW (STACKED CARDS WITHOUT PIN)
+           MOBILE VIEW (POLISHED VERTICAL JOURNEY WITH ACCURATE TIMELINE)
            ============================================================= */
-        <div className="w-full px-6 py-12 flex flex-col gap-10">
+        <div className="w-full px-5 sm:px-8 py-14 flex flex-col gap-10">
           {/* Header */}
           <div>
             <span className="font-sans text-xs uppercase tracking-[0.25em] text-wd-orange font-semibold block mb-1.5">
@@ -664,91 +664,144 @@ export const Pilares: React.FC = () => {
             </p>
           </div>
 
-          {/* Stacked Pillars with Left Continuous Stem */}
-          <div className="relative pl-8 flex flex-col gap-8">
-            {/* Continuous SVG Stem */}
-            <div className="absolute left-2.5 top-2 bottom-4 w-1">
-              <svg className="w-4 h-full overflow-visible" preserveAspectRatio="none">
-                <path
-                  d="M 2 0 L 2 1000"
-                  stroke="rgba(255,255,255,0.12)"
-                  strokeWidth="2"
-                  strokeDasharray="4 4"
-                />
-                <path
-                  ref={mobileStemRef}
-                  d="M 2 0 L 2 1000"
-                  stroke="#F26F22"
-                  strokeWidth="3"
-                  strokeLinecap="round"
-                />
-              </svg>
+          {/* Stacked Pillars with Flawlessly Aligned Left Timeline */}
+          <div className="relative pl-7 sm:pl-10 flex flex-col gap-8">
+            {/* Continuous Timeline Stem running from first node to last node */}
+            <div className="absolute left-[13px] sm:left-[17px] top-6 bottom-8 w-[2px] bg-white/10 overflow-hidden">
+              <div
+                ref={mobileStemRef}
+                className="w-full h-full bg-wd-orange origin-top will-change-transform"
+                style={{ transform: "scaleY(0)" }}
+              />
             </div>
 
             {PILARES_DATA.map((pilar, index) => (
               <div
                 key={pilar.id}
-                className="mobile-pilar-card relative flex flex-col gap-3 bg-wd-deep-blue/80 backdrop-blur-md border border-white/15 rounded-[0.5rem] p-6 shadow-xl"
+                className="mobile-pilar-card relative flex flex-col gap-4 bg-wd-deep-blue/85 backdrop-blur-md border border-white/15 rounded-[0.5rem] p-5 sm:p-7 shadow-2xl transition-all"
               >
-                {/* Node circle on stem */}
-                <div className="absolute -left-[2.35rem] top-8 w-3.5 h-3.5 rounded-full bg-wd-orange border-2 border-wd-dark-blue shadow-[0_0_8px_rgba(242,111,34,0.6)]" />
+                {/* Node indicator aligned with the vertical stem line */}
+                <div className="absolute -left-[1.75rem] sm:-left-[2.5rem] top-6 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-wd-dark-blue border-2 border-wd-orange flex items-center justify-center shadow-[0_0_10px_rgba(242,111,34,0.5)] z-10">
+                  <div className="w-2 h-2 rounded-full bg-wd-orange" />
+                </div>
 
-                {/* Handcrafted Icon */}
-                <div className="flex items-center justify-between">
-                  <div className="w-10 h-10">
-                    {index === 0 && (
-                      <svg className="w-9 h-9" viewBox="0 0 48 48" fill="none">
-                        <path
-                          className="mobile-icon-path-0"
-                          d="M 24 8 C 16 16 13 26 13 33 C 13 40 18 44 24 44 C 30 44 35 40 35 33 C 35 26 32 16 24 8 Z"
-                          stroke="#F26F22"
-                          strokeWidth="2"
-                        />
-                      </svg>
-                    )}
-                    {index === 1 && (
-                      <svg className="w-9 h-9" viewBox="0 0 48 48" fill="none">
-                        <path
-                          className="mobile-icon-path-1"
-                          d="M 24 44 L 24 16 C 24 12 18 10 12 12 C 10 18 14 24 24 24 C 34 24 38 18 36 12 C 30 10 24 12 24 16"
-                          stroke="#F26F22"
-                          strokeWidth="2"
-                        />
-                      </svg>
-                    )}
-                    {index === 2 && (
-                      <svg className="w-9 h-9" viewBox="0 0 48 48" fill="none">
-                        <path
-                          className="mobile-icon-path-2"
-                          d="M 24 44 L 24 24 M 24 32 L 18 24 M 24 28 L 30 20 M 24 24 C 15 24 11 16 16 10 C 21 4 25 8 24 12 C 26 6 34 6 36 12 C 41 14 39 24 24 24 Z"
-                          stroke="#F26F22"
-                          strokeWidth="2"
-                        />
-                      </svg>
-                    )}
+                {/* Card Top Row: Handcrafted Icon + Stage Label + Progress Step */}
+                <div className="flex items-center justify-between pb-3 border-b border-white/10">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-8 h-8 flex items-center justify-center">
+                      {index === 0 && (
+                        <svg className="w-8 h-8" viewBox="0 0 48 48" fill="none">
+                          <path
+                            className="mobile-icon-path-0"
+                            d="M 24 8 C 16 16 13 26 13 33 C 13 40 18 44 24 44 C 30 44 35 40 35 33 C 35 26 32 16 24 8 Z"
+                            stroke="#F26F22"
+                            strokeWidth="2.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            className="mobile-icon-path-0"
+                            d="M 24 20 L 24 38 M 24 28 C 28 26 30 22 30 22"
+                            stroke="#F26F22"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      )}
+                      {index === 1 && (
+                        <svg className="w-8 h-8" viewBox="0 0 48 48" fill="none">
+                          <path
+                            className="mobile-icon-path-1"
+                            d="M 24 44 L 24 16 C 24 12 18 10 12 12 C 10 18 14 24 24 24 C 34 24 38 18 36 12 C 30 10 24 12 24 16"
+                            stroke="#F26F22"
+                            strokeWidth="2.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                          <path
+                            className="mobile-icon-path-1"
+                            d="M 18 16 C 21 13 24 13 24 13 C 24 13 27 13 30 16"
+                            stroke="#F26F22"
+                            strokeWidth="1.8"
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                      )}
+                      {index === 2 && (
+                        <svg className="w-8 h-8" viewBox="0 0 48 48" fill="none">
+                          <path
+                            className="mobile-icon-path-2"
+                            d="M 24 44 L 24 24 M 24 32 L 18 24 M 24 28 L 30 20"
+                            stroke="#F26F22"
+                            strokeWidth="2.2"
+                            strokeLinecap="round"
+                          />
+                          <path
+                            className="mobile-icon-path-2"
+                            d="M 24 24 C 15 24 11 16 16 10 C 21 4 25 8 24 12 C 26 6 34 6 36 12 C 41 14 39 24 24 24 Z"
+                            stroke="#F26F22"
+                            strokeWidth="2.2"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      )}
+                    </div>
+                    <span className="font-sans text-[11px] sm:text-xs uppercase tracking-[0.2em] text-wd-orange font-semibold">
+                      Estágio: {pilar.estagio}
+                    </span>
                   </div>
+
                   <span className="font-condensed font-bold text-xs tracking-widest text-white/40 tabular-nums">
                     0{index + 1} / 03
                   </span>
                 </div>
 
-                <span className="font-sans text-xs uppercase tracking-[0.25em] text-wd-orange font-semibold">
-                  Estágio: {pilar.estagio}
-                </span>
-
-                <h3 className="font-condensed font-bold uppercase text-2xl text-white tracking-tight leading-tight">
+                {/* Title */}
+                <h3 className="font-condensed font-bold uppercase text-2xl sm:text-3xl text-white tracking-tight leading-tight">
                   {pilar.titulo}
                 </h3>
 
+                {/* Destaque (Stage 2) */}
                 {pilar.destaque && (
-                  <p className="font-condensed font-bold uppercase text-xl text-wd-orange tracking-tight my-1">
+                  <p className="font-condensed font-black uppercase text-xl sm:text-2xl text-wd-orange tracking-tight leading-tight my-1">
                     “{pilar.destaque}”
                   </p>
                 )}
 
-                <p className="font-sans text-sm text-white/80 leading-relaxed">
+                {/* Text narrative */}
+                <p className="font-sans text-sm sm:text-base text-white/80 leading-relaxed">
                   {pilar.texto}
                 </p>
+
+                {/* Segmented Progress Bar (Matches Desktop Quality) */}
+                <div className="w-full pt-2">
+                  <div className="grid grid-cols-3 gap-1.5 w-full">
+                    <div
+                      className={`h-1.5 rounded-full ${
+                        index === 0
+                          ? "bg-wd-orange shadow-[0_0_8px_rgba(242,111,34,0.5)]"
+                          : "bg-wd-orange/50"
+                      }`}
+                    />
+                    <div
+                      className={`h-1.5 rounded-full ${
+                        index === 1
+                          ? "bg-wd-orange shadow-[0_0_8px_rgba(242,111,34,0.5)]"
+                          : index > 1
+                          ? "bg-wd-orange/50"
+                          : "bg-white/10"
+                      }`}
+                    />
+                    <div
+                      className={`h-1.5 rounded-full ${
+                        index === 2
+                          ? "bg-wd-orange shadow-[0_0_8px_rgba(242,111,34,0.5)]"
+                          : "bg-white/10"
+                      }`}
+                    />
+                  </div>
+                </div>
               </div>
             ))}
           </div>

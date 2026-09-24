@@ -224,12 +224,12 @@ export const Vote: React.FC = () => {
       </div>
 
       {/* Main Center Content */}
-      <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center text-center gap-6 sm:gap-8">
+      <div className="relative z-10 w-full max-w-4xl mx-auto flex flex-col items-center text-center gap-5 sm:gap-8 px-2 sm:px-0">
         
         {/* Título: SplitText por linhas com máscara */}
         <h2
           aria-label="Vamos plantar esse futuro juntos."
-          className="font-condensed font-bold uppercase text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-[1.05]"
+          className="font-condensed font-bold uppercase text-3xl sm:text-5xl md:text-6xl lg:text-7xl text-white tracking-tight leading-[1.05]"
         >
           <span className="block overflow-hidden pb-1">
             <span className="vote-title-line inline-block">Vamos plantar esse</span>
@@ -242,22 +242,22 @@ export const Vote: React.FC = () => {
         {/* Frase na cor de destaque */}
         <p
           ref={phraseRef}
-          className="font-sans font-bold text-2xl sm:text-3xl md:text-4xl text-wd-orange tracking-tight"
+          className="font-sans font-bold text-xl sm:text-3xl md:text-4xl text-wd-orange tracking-tight"
         >
           Bora plantar o futuro
         </p>
 
-        {/* Urna GRANDE (Reusando exatamente o componente da hero, em tamanho maior) */}
-        <div className="flex flex-col items-center mt-2" role="group" aria-label="Número 20444">
-          <span className="font-sans text-xs sm:text-sm uppercase tracking-[0.25em] text-white/70 font-semibold mb-3">
+        {/* Urna GRANDE (Reusando exatamente o componente da hero, em tamanho maior e responsivo) */}
+        <div className="flex flex-col items-center mt-2 w-full" role="group" aria-label="Número 20444">
+          <span className="font-sans text-[11px] sm:text-sm uppercase tracking-[0.25em] text-white/70 font-semibold mb-3">
             Na urna, digite
           </span>
 
-          <div className="flex items-center gap-2 sm:gap-3 md:gap-4" aria-hidden="true">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-3 md:gap-4 w-full" aria-hidden="true">
             {URNA_DIGITS.map((_, i) => (
               <div
                 key={i}
-                className="vote-urna-slot relative w-13 sm:w-18 md:w-22 h-18 sm:h-24 md:h-28 rounded-[0.35rem] border-2 border-white/25 bg-black/60 backdrop-blur-md overflow-hidden flex items-center justify-center shadow-2xl opacity-0"
+                className="vote-urna-slot relative w-[52px] sm:w-18 md:w-22 h-[72px] sm:h-24 md:h-28 rounded-[0.35rem] border-2 border-white/25 bg-black/60 backdrop-blur-md overflow-hidden flex items-center justify-center shadow-2xl opacity-0"
               >
                 {/* Electronic visor inner vignette */}
                 <div className="pointer-events-none absolute inset-0 z-10 rounded-[0.35rem] shadow-[inset_0_3px_6px_rgba(0,0,0,0.8),inset_0_-3px_6px_rgba(0,0,0,0.8)]" />
@@ -269,7 +269,7 @@ export const Vote: React.FC = () => {
                   {DIGIT_CYCLE.map((num, idx) => (
                     <div
                       key={idx}
-                      className="w-full h-18 sm:h-24 md:h-28 flex items-center justify-center font-condensed font-bold tabular-nums text-4xl sm:text-5xl md:text-6xl text-white"
+                      className="w-full h-[72px] sm:h-24 md:h-28 flex items-center justify-center font-condensed font-bold tabular-nums text-4xl sm:text-5xl md:text-6xl text-white"
                     >
                       {num}
                     </div>
@@ -283,7 +283,7 @@ export const Vote: React.FC = () => {
         {/* Texto descritivo */}
         <p
           ref={descRef}
-          className="font-sans text-base sm:text-lg text-white/80 max-w-xl leading-relaxed mt-2"
+          className="font-sans text-sm sm:text-base md:text-lg text-white/80 max-w-xl leading-relaxed mt-1 sm:mt-2 px-4"
         >
           Guarde o número e compartilhe com quem também acredita no Nortão.
         </p>
@@ -291,13 +291,13 @@ export const Vote: React.FC = () => {
         {/* Botão principal + Botão secundário */}
         <div
           ref={ctaRef}
-          className="flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6 mt-2 w-full max-w-md"
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-6 mt-2 w-full max-w-sm sm:max-w-md"
         >
           {/* Botão principal: Compartilhar no WhatsApp */}
           <button
             type="button"
             onClick={handleShareWhatsApp}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-wd-orange hover:bg-[#d8580f] text-white px-8 py-4 rounded-[0.25rem] font-sans font-semibold text-base uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-xl active:scale-[0.98] group"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-wd-orange hover:bg-[#d8580f] active:bg-[#c44e0c] text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-[0.25rem] font-sans font-semibold text-sm sm:text-base uppercase tracking-wider transition-all duration-200 cursor-pointer shadow-xl active:scale-[0.98] group min-h-[48px]"
           >
             <svg className="w-5 h-5 fill-currentColor shrink-0" viewBox="0 0 24 24">
               <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21 5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.816 9.816 0 0 0 12.04 2m.01 1.67c2.2 0 4.26.86 5.82 2.42a8.225 8.225 0 0 1 2.41 5.83c0 4.54-3.7 8.24-8.24 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.196 8.196 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.24-8.24m4.52 11.66c-.25-.13-1.47-.72-1.7-.81-.23-.08-.39-.13-.56.13-.17.25-.64.81-.79.97-.14.17-.29.19-.54.06-.25-.13-1.06-.39-2.02-1.25-.75-.67-1.26-1.5-1.41-1.75-.15-.25-.02-.39.11-.51.11-.11.25-.29.37-.44.13-.15.17-.25.25-.42.08-.17.04-.31-.02-.44-.06-.13-.56-1.34-.76-1.84-.2-.49-.4-.42-.56-.43h-.48c-.16 0-.42.06-.64.3-.22.25-.86.84-.86 2.05s.88 2.38 1 2.54c.13.17 1.73 2.64 4.2 3.7.59.25 1.05.4 1.41.51.59.19 1.13.16 1.56.1.47-.07 1.47-.6 1.68-1.18.21-.58.21-1.07.15-1.18-.07-.12-.23-.19-.48-.31" />
@@ -310,7 +310,7 @@ export const Vote: React.FC = () => {
             href="https://www.instagram.com/gamba_geovane"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/20 hover:border-white/50 bg-white/5 hover:bg-white/10 text-white px-6 py-4 rounded-[0.25rem] font-sans font-semibold text-sm uppercase tracking-wider transition-colors duration-200"
+            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 border border-white/20 hover:border-white/50 active:bg-white/15 bg-white/5 hover:bg-white/10 text-white px-6 py-3.5 sm:py-4 rounded-[0.25rem] font-sans font-semibold text-xs sm:text-sm uppercase tracking-wider transition-colors duration-200 min-h-[48px]"
           >
             <span>Seguir @gamba_geovane</span>
             <svg className="w-4 h-4 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -323,14 +323,14 @@ export const Vote: React.FC = () => {
         {countdown && (
           <div
             ref={countdownRef}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-[0.25rem] bg-white/5 border border-white/10 mt-4"
+            className="inline-flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-[0.25rem] bg-white/5 border border-white/10 mt-2 sm:mt-4"
           >
             {countdown.label && (
-              <span className="font-sans text-xs uppercase tracking-widest text-white/50 font-medium">
+              <span className="font-sans text-[11px] sm:text-xs uppercase tracking-widest text-white/50 font-medium">
                 {countdown.label}
               </span>
             )}
-            <span className="font-condensed font-bold text-lg text-wd-orange tracking-wider">
+            <span className="font-condensed font-bold text-base sm:text-lg text-wd-orange tracking-wider">
               {countdown.text}
             </span>
           </div>

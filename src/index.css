@@ -129,16 +129,25 @@ html, body {
     background: linear-gradient(
       180deg,
       rgba(14, 17, 24, 0.95) 0%,
-      rgba(14, 17, 24, 0.8) 45%,
-      rgba(31, 42, 68, 0.25) 75%,
-      rgba(31, 42, 68, 0) 100%
+      rgba(14, 17, 24, 0.82) 30%,
+      rgba(14, 17, 24, 0.78) 65%,
+      rgba(14, 17, 24, 0.94) 100%
     );
   }
 }
 
+/* Hide scrollbars for touch carousels */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* Offset for fixed header navigation */
 [id] {
-  scroll-margin-top: 5rem;
+  scroll-margin-top: 4.5rem;
 }
 
 /* Safe area inset for mobile bottom bar */

@@ -168,12 +168,12 @@ export const QuemE: React.FC = () => {
     <section
       ref={sectionRef}
       id="quem-e"
-      className="relative z-20 w-full min-h-screen bg-wd-deep-blue text-white py-24 sm:py-32 px-6 md:px-12 lg:px-16 border-t border-white/10"
+      className="relative z-20 w-full min-h-screen bg-wd-deep-blue text-white py-16 sm:py-24 md:py-32 px-5 sm:px-8 md:px-12 lg:px-16 border-t border-white/10"
     >
-      <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start">
+      <div className="max-w-[1440px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-8 sm:gap-12 lg:gap-16 items-start">
         
         {/* Left Column: Vertical Photo (4:5 Ratio) with Clip-Path Reveal & Parallax */}
-        <div className="lg:col-span-5 w-full max-w-md mx-auto lg:max-w-none">
+        <div className="lg:col-span-5 w-full max-w-sm sm:max-w-md mx-auto lg:max-w-none">
           <div
             ref={imageWrapperRef}
             className="relative w-full aspect-[4/5] rounded-[0.25rem] overflow-hidden border border-white/15 bg-black/30 shadow-2xl"
@@ -187,11 +187,16 @@ export const QuemE: React.FC = () => {
               height={1200}
               className="w-full h-full object-cover scale-105 will-change-transform"
             />
+            {/* Subtle documentary location tag */}
+            <div className="absolute bottom-3 left-3 flex items-center gap-1.5 bg-black/65 backdrop-blur-md px-2.5 py-1 rounded text-[11px] text-white/90 font-sans tracking-wide border border-white/10">
+              <span className="w-1.5 h-1.5 rounded-full bg-wd-orange" />
+              <span>Alta Floresta · MT</span>
+            </div>
           </div>
         </div>
 
         {/* Right Column: Narrative, Quote, Bio & Ficha Técnica */}
-        <div className="lg:col-span-7 flex flex-col gap-8 sm:gap-10">
+        <div className="lg:col-span-7 flex flex-col gap-6 sm:gap-8 lg:gap-10">
           
           {/* Label */}
           <div ref={labelRef} className="flex items-center gap-2.5">
@@ -202,7 +207,7 @@ export const QuemE: React.FC = () => {
           </div>
 
           {/* Título: Máscara por linhas */}
-          <h2 className="font-condensed font-bold uppercase text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight leading-[1.05]">
+          <h2 className="font-condensed font-bold uppercase text-2xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight leading-[1.05]">
             <span className="block overflow-hidden">
               <span className="quem-e-title-line inline-block">Raiz no campo,</span>
             </span>
@@ -212,21 +217,21 @@ export const QuemE: React.FC = () => {
           </h2>
 
           {/* Citação em Destaque (Elemento Mais Forte: Display Grande + Aspas Grandes na cor de destaque) */}
-          <div className="relative pl-6 sm:pl-8 border-l-2 border-wd-orange/40 my-2">
+          <div className="relative pl-4 sm:pl-8 border-l-2 border-wd-orange/50 my-1 sm:my-2">
             <blockquote
               ref={quoteRef}
-              className="block font-sans text-2xl sm:text-3xl md:text-4xl font-semibold text-white tracking-tight leading-snug"
+              className="block font-sans text-xl sm:text-2xl md:text-3xl lg:text-4xl font-semibold text-white tracking-tight leading-snug"
             >
               {QUOTE_WORDS.map((word, i) => (
                 <span
                   key={i}
-                  className="quote-word inline-block mr-2 text-white will-change-[opacity]"
+                  className="quote-word inline-block mr-1.5 sm:mr-2 text-white will-change-[opacity]"
                 >
                   {word}
                 </span>
               ))}
             </blockquote>
-            <span className="block font-sans text-sm sm:text-base text-wd-orange font-medium mt-3">
+            <span className="block font-sans text-xs sm:text-base text-wd-orange font-medium mt-2.5 sm:mt-3">
               — Geovane Gamba
             </span>
           </div>
