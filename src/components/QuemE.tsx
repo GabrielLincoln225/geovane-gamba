@@ -27,8 +27,11 @@ export const QuemE: React.FC = () => {
     if (!section) return
 
     let ctx: gsap.Context | undefined
-    const timer = setTimeout(() => {
-      ctx = gsap.context(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          observer.disconnect()
+          ctx = gsap.context(() => {
       // 1. Image reveal with clip-path + parallax
       if (imageWrapperRef.current && imageRef.current) {
         gsap.fromTo(
@@ -148,10 +151,15 @@ export const QuemE: React.FC = () => {
         )
       }
     }, sectionRef)
-    }, 150)
+        }
+      },
+      { rootMargin: "400px" }
+    )
+
+    observer.observe(section)
 
     return () => {
-      clearTimeout(timer)
+      observer.disconnect()
       ctx?.revert()
     }
   }, [])

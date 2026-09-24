@@ -5,8 +5,7 @@ import QRCode from "qrcode"
 
 gsap.registerPlugin(ScrollTrigger)
 
-// Configurable constants as requested
-export const SITE_URL = "[URL DO SITE]"
+export const SITE_URL = "https://geovane-gamba.vercel.app"
 export const WHATSAPP_SHARE_URL = `https://wa.me/?text=${encodeURIComponent(
   `Geovane Gamba, Deputado Estadual 20444. A força jovem do Nortão. Conheça: ${SITE_URL}`
 )}`
@@ -59,134 +58,141 @@ export const Vote: React.FC = () => {
     return () => clearInterval(timer)
   }, [])
 
-  // Generate QR Code via library (desktop only)
-  useEffect(() => {
-    if (qrCanvasRef.current) {
-      QRCode.toCanvas(
-        qrCanvasRef.current,
-        "https://www.instagram.com/gamba_geovane",
-        {
-          width: 90,
-          margin: 1,
-          color: {
-            dark: "#0e1118",
-            light: "#ffffff",
-          },
-        },
-        (error) => {
-          if (error) console.error("QR Code Error:", error)
-        }
-      )
-    }
-  }, [])
-
-  // GSAP Single Orchestrated Timeline on Entry
+  // GSAP Single Orchestrated Timeline on Entry + QRCode deferred
   useEffect(() => {
     const section = sectionRef.current
     if (!section) return
 
     let ctx: gsap.Context | undefined
-    const timer = setTimeout(() => {
-      ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: "top 65%",
-          once: true,
-        },
-      })
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          observer.disconnect()
 
-      // 1. Title masked lines
-      tl.fromTo(
-        ".vote-title-line",
-        { yPercent: 110 },
-        {
-          yPercent: 0,
-          duration: 0.8,
-          stagger: 0.12,
-          ease: "power3.out",
-        },
-        0
-      )
+          // Generate QR Code via library (desktop only)
+          if (qrCanvasRef.current) {
+            QRCode.toCanvas(
+              qrCanvasRef.current,
+              "https://www.instagram.com/gamba_geovane",
+              {
+                width: 90,
+                margin: 1,
+                color: {
+                  dark: "#0e1118",
+                  light: "#ffffff",
+                },
+              },
+              (error) => {
+                if (error) console.error("QR Code Error:", error)
+              }
+            )
+          }
 
-      // 2. Phrase: "Bora plantar o futuro"
-      if (phraseRef.current) {
-        tl.fromTo(
-          phraseRef.current,
-          { opacity: 0, y: 15 },
-          { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
-          0.3
-        )
-      }
+          ctx = gsap.context(() => {
+            const tl = gsap.timeline({
+              scrollTrigger: {
+                trigger: section,
+                start: "top 65%",
+                once: true,
+              },
+            })
 
-      // 3. Urna Slots appear
-      tl.fromTo(
-        ".vote-urna-slot",
-        { opacity: 0, scale: 0.92, y: 15 },
-        {
-          opacity: 1,
-          scale: 1,
-          y: 0,
-          duration: 0.45,
-          stagger: 0.05,
-          ease: "power2.out",
-        },
-        0.4
-      )
+            // 1. Title masked lines
+            tl.fromTo(
+              ".vote-title-line",
+              { yPercent: 110 },
+              {
+                yPercent: 0,
+                duration: 0.8,
+                stagger: 0.12,
+                ease: "power3.out",
+              },
+              0
+            )
 
-      // 4. Urna Odometer cascading roll (same logic as Hero, enlarged)
-      TARGET_INDICES.forEach((targetIndex, i) => {
-        tl.fromTo(
-          `.vote-odometer-strip-${i}`,
-          { yPercent: 0 },
-          {
-            yPercent: -(targetIndex * 5),
-            duration: 1.0,
-            ease: "power3.out",
-          },
-          0.5 + i * 0.1
-        )
-      })
+            // 2. Phrase: "Bora plantar o futuro"
+            if (phraseRef.current) {
+              tl.fromTo(
+                phraseRef.current,
+                { opacity: 0, y: 15 },
+                { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+                0.3
+              )
+            }
 
-      // 5. Description text
-      if (descRef.current) {
-        tl.fromTo(
-          descRef.current,
-          { opacity: 0, y: 15 },
-          { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
-          1.0
-        )
-      }
+            // 3. Urna Slots appear
+            tl.fromTo(
+              ".vote-urna-slot",
+              { opacity: 0, scale: 0.92, y: 15 },
+              {
+                opacity: 1,
+                scale: 1,
+                y: 0,
+                duration: 0.45,
+                stagger: 0.05,
+                ease: "power2.out",
+              },
+              0.4
+            )
 
-      // 6. Buttons + Countdown (fade + slide por último)
-      if (ctaRef.current) {
-        tl.fromTo(
-          ctaRef.current.children,
-          { opacity: 0, y: 18 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.5,
-            stagger: 0.1,
-            ease: "power2.out",
-          },
-          1.15
-        )
-      }
+            // 4. Urna Odometer cascading roll (same logic as Hero, enlarged)
+            TARGET_INDICES.forEach((targetIndex, i) => {
+              tl.fromTo(
+                `.vote-odometer-strip-${i}`,
+                { yPercent: 0 },
+                {
+                  yPercent: -(targetIndex * 5),
+                  duration: 1.0,
+                  ease: "power3.out",
+                },
+                0.5 + i * 0.1
+              )
+            })
 
-      if (countdownRef.current) {
-        tl.fromTo(
-          countdownRef.current,
-          { opacity: 0, y: 10 },
-          { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
-          1.3
-        )
-      }
-    }, sectionRef)
-    }, 150)
+            // 5. Description text
+            if (descRef.current) {
+              tl.fromTo(
+                descRef.current,
+                { opacity: 0, y: 15 },
+                { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
+                1.0
+              )
+            }
+
+            // 6. Buttons + Countdown (fade + slide por último)
+            if (ctaRef.current) {
+              tl.fromTo(
+                ctaRef.current.children,
+                { opacity: 0, y: 18 },
+                {
+                  opacity: 1,
+                  y: 0,
+                  duration: 0.5,
+                  stagger: 0.1,
+                  ease: "power2.out",
+                },
+                1.15
+              )
+            }
+
+            if (countdownRef.current) {
+              tl.fromTo(
+                countdownRef.current,
+                { opacity: 0, y: 10 },
+                { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" },
+                1.3
+              )
+            }
+          }, sectionRef)
+        }
+      },
+      { rootMargin: "400px" }
+    )
+
+    observer.observe(section)
 
     return () => {
-      clearTimeout(timer)
+      observer.disconnect()
       ctx?.revert()
     }
   }, [])

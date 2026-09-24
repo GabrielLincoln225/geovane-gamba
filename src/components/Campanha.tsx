@@ -65,43 +65,47 @@ export const Campanha: React.FC = () => {
     if (!section || !track || isMobile) return
 
     let ctx: gsap.Context | undefined
-    const timer = setTimeout(() => {
-      ctx = gsap.context(() => {
-      // Horizontal scrub timeline for desktop
-      const totalCards = CAMPANHA_DATA.length
-      // Calculate how far to translate the track
-      // We want to translate track so all cards move past the viewport
-      const scrollDistance = () => track.scrollWidth - window.innerWidth + 200
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          observer.disconnect()
+          ctx = gsap.context(() => {
+            const totalCards = CAMPANHA_DATA.length
+            const scrollDistance = () => track.scrollWidth - window.innerWidth + 200
 
-      const tl = gsap.timeline({
-        scrollTrigger: {
-          trigger: section,
-          start: "top top",
-          end: () => `+=${scrollDistance()}`,
-          pin: true,
-          scrub: 1,
-          anticipatePin: 1,
-          invalidateOnRefresh: true,
-          onUpdate: (self) => {
-            // Update counter "01 / 05" through "05 / 05"
-            const idx = Math.min(
-              totalCards,
-              Math.max(1, Math.floor(self.progress * totalCards) + 1)
-            )
-            setCurrentIndex(idx)
-          },
-        },
-      })
+            const tl = gsap.timeline({
+              scrollTrigger: {
+                trigger: section,
+                start: "top top",
+                end: () => `+=${scrollDistance()}`,
+                pin: true,
+                scrub: 1,
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+                onUpdate: (self) => {
+                  const idx = Math.min(
+                    totalCards,
+                    Math.max(1, Math.floor(self.progress * totalCards) + 1)
+                  )
+                  setCurrentIndex(idx)
+                },
+              },
+            })
 
-      tl.to(track, {
-        x: () => -(track.scrollWidth - window.innerWidth + 120),
-        ease: "none",
-      })
-    }, sectionRef)
-    }, 150)
+            tl.to(track, {
+              x: () => -(track.scrollWidth - window.innerWidth + 120),
+              ease: "none",
+            })
+          }, sectionRef)
+        }
+      },
+      { rootMargin: "400px" }
+    )
+
+    observer.observe(section)
 
     return () => {
-      clearTimeout(timer)
+      observer.disconnect()
       ctx?.revert()
     }
   }, [isMobile])
