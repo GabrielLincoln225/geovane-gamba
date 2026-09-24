@@ -65,18 +65,18 @@ export const Pilares: React.FC = () => {
 
     const ctx = gsap.context(() => {
       if (!isMobile && stemPath) {
-        // Line total length
+        // Calculate exact length of the vertical stem line
         const totalStemLength = stemPath.getTotalLength()
         gsap.set(stemPath, {
           strokeDasharray: totalStemLength,
           strokeDashoffset: totalStemLength,
         })
 
-        // Prepare icon paths
+        // Setup handcrafted SVG icons with stroke-dash for line drawing
         const iconPaths = [
-          document.querySelectorAll(".card-icon-path-0"),
-          document.querySelectorAll(".card-icon-path-1"),
-          document.querySelectorAll(".card-icon-path-2"),
+          document.querySelectorAll(".pilar-card-icon-0"),
+          document.querySelectorAll(".pilar-card-icon-1"),
+          document.querySelectorAll(".pilar-card-icon-2"),
         ]
 
         iconPaths.forEach((paths, i) => {
@@ -92,154 +92,198 @@ export const Pilares: React.FC = () => {
           })
         })
 
-        // Master orchestrated timeline for Desktop (~200vh pinned)
-        // Using scrub: 0.3 for instant, snappy tracking that descends 1:1 with user scroll
-        // No anticipatePin to eliminate any flicker/jump when pinning with Lenis
+        // Pacing configuration:
+        // Pinned for 360vh so each stage has ~100vh of comfortable, stable reading time.
+        // Scrub of 0.6 ensures a smooth, buttery connection to the user's scroll without flying by.
         const pinTl = gsap.timeline({
           scrollTrigger: {
             trigger: section,
             start: "top top",
-            end: "+=200vh",
+            end: "+=360vh",
             pin: true,
             pinSpacing: true,
-            scrub: 0.3,
+            scrub: 0.6,
             invalidateOnRefresh: true,
           },
         })
 
-        // -------------------------------------------------------------
-        // INITIAL STATE: STAGE 1 (SEMENTE) ACTIVE
-        // -------------------------------------------------------------
-        // Stem starts connected to Node 1 (offset at ~85% of total length)
-        // From Node 1 (y=30) to Node 2 (y=170) is ~50%
-        // From Node 2 (y=170) to Node 3 (y=310) is 100%
+        // Initial setup: Stage 1 (Semente) is active
         gsap.set(stemPath, { strokeDashoffset: totalStemLength * 0.95 })
+        gsap.set(".pilar-card-stage-0", { opacity: 1, y: 0, display: "flex" })
+        gsap.set(".pilar-card-stage-1", { opacity: 0, y: 24, display: "none" })
+        gsap.set(".pilar-card-stage-2", { opacity: 0, y: 24, display: "none" })
 
-        // -------------------------------------------------------------
-        // STEP 1 -> STEP 2: SEMENTE TO BROTO (t = 0.15 to 0.45)
-        // -------------------------------------------------------------
-        // 1. Draw stem down to Node 2
-        pinTl.fromTo(
+        // =============================================================
+        // ZONE 1: SEMENTE IS HELD AT REST (0.00 to 0.28)
+        // Ample scroll distance for the user to comfortably read Stage 1
+        // =============================================================
+
+        // =============================================================
+        // TRANSITION 1: SEMENTE -> BROTO (0.28 to 0.40)
+        // =============================================================
+        // 1. Draw stem down from Node 1 to Node 2
+        pinTl.to(
           stemPath,
-          { strokeDashoffset: totalStemLength * 0.95 },
-          { strokeDashoffset: totalStemLength * 0.5, duration: 1.0, ease: "none" },
-          0.15
+          {
+            strokeDashoffset: totalStemLength * 0.5,
+            duration: 0.4,
+            ease: "none",
+          },
+          0.28
         )
 
-        // 2. Dim Stage 1 on left, light up Stage 2
-        pinTl.fromTo(
+        // 2. Dim Node 1 on left, light up Node 2
+        pinTl.to(
           ".stepper-item-0",
-          { opacity: 1 },
-          { opacity: 0.25, duration: 0.5, ease: "power1.out" },
-          0.2
+          { opacity: 0.25, duration: 0.3, ease: "power1.out" },
+          0.28
         )
-        pinTl.fromTo(
+        pinTl.to(
           ".stepper-node-ring-0",
-          { opacity: 1, scale: 1.3 },
-          { opacity: 0, scale: 1, duration: 0.4, ease: "power1.out" },
-          0.2
+          { opacity: 0, scale: 0.9, duration: 0.25, ease: "power1.out" },
+          0.28
         )
 
-        pinTl.fromTo(
+        pinTl.to(
           ".stepper-item-1",
-          { opacity: 0.25 },
-          { opacity: 1, duration: 0.5, ease: "power1.out" },
-          0.35
+          { opacity: 1, duration: 0.3, ease: "power1.out" },
+          0.33
         )
         pinTl.fromTo(
           ".stepper-node-ring-1",
           { opacity: 0, scale: 0.8 },
-          { opacity: 1, scale: 1.3, duration: 0.4, ease: "power2.out" },
-          0.35
+          { opacity: 1, scale: 1.25, duration: 0.3, ease: "power2.out" },
+          0.33
         )
 
-        // 3. Card transition: Semente fades out, Broto fades in
-        pinTl.fromTo(
-          ".card-stage-0",
-          { opacity: 1, y: 0 },
-          { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" },
-          0.15
-        )
-        pinTl.fromTo(
-          ".card-stage-1",
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
-          0.35
+        // 3. Card transition: Stage 0 slides out, Stage 1 slides in
+        pinTl.to(
+          ".pilar-card-stage-0",
+          {
+            opacity: 0,
+            y: -20,
+            duration: 0.25,
+            ease: "power2.in",
+            onComplete: () => {
+              const el = document.querySelector(".pilar-card-stage-0") as HTMLElement
+              if (el) el.style.display = "none"
+            },
+          },
+          0.28
         )
 
-        // 4. Draw Broto SVG icon
+        pinTl.set(
+          ".pilar-card-stage-1",
+          { display: "flex" },
+          0.33
+        )
+
+        pinTl.fromTo(
+          ".pilar-card-stage-1",
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" },
+          0.34
+        )
+
+        // 4. Draw Broto SVG line icon
         iconPaths[1].forEach((p) => {
           pinTl.to(
             p,
-            { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" },
-            0.4
+            { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" },
+            0.36
           )
         })
 
-        // -------------------------------------------------------------
-        // HOLD AT BROTO: "O Nortão precisa ser ouvido." (t = 0.45 to 0.65)
-        // -------------------------------------------------------------
+        // =============================================================
+        // ZONE 2: BROTO IS HELD AT REST (0.40 to 0.68)
+        // Ample scroll distance for reading "O Nortão precisa ser ouvido."
+        // =============================================================
 
-        // -------------------------------------------------------------
-        // STEP 2 -> STEP 3: BROTO TO ÁRVORE (t = 0.65 to 0.95)
-        // -------------------------------------------------------------
-        // 1. Draw stem down to Node 3
+        // =============================================================
+        // TRANSITION 2: BROTO -> ÁRVORE (0.68 to 0.80)
+        // =============================================================
+        // 1. Draw stem down from Node 2 to Node 3
         pinTl.to(
           stemPath,
-          { strokeDashoffset: 0, duration: 1.0, ease: "none" },
-          0.65
+          {
+            strokeDashoffset: 0,
+            duration: 0.4,
+            ease: "none",
+          },
+          0.68
         )
 
-        // 2. Dim Stage 2 on left, light up Stage 3
+        // 2. Dim Node 2 on left, light up Node 3
         pinTl.to(
           ".stepper-item-1",
-          { opacity: 0.25, duration: 0.5, ease: "power1.out" },
-          0.7
+          { opacity: 0.25, duration: 0.3, ease: "power1.out" },
+          0.68
         )
         pinTl.to(
           ".stepper-node-ring-1",
-          { opacity: 0, scale: 1, duration: 0.4, ease: "power1.out" },
-          0.7
+          { opacity: 0, scale: 0.9, duration: 0.25, ease: "power1.out" },
+          0.68
         )
 
         pinTl.to(
           ".stepper-item-2",
-          { opacity: 1, duration: 0.5, ease: "power1.out" },
-          0.85
+          { opacity: 1, duration: 0.3, ease: "power1.out" },
+          0.73
         )
         pinTl.fromTo(
           ".stepper-node-ring-2",
           { opacity: 0, scale: 0.8 },
-          { opacity: 1, scale: 1.3, duration: 0.4, ease: "power2.out" },
-          0.85
+          { opacity: 1, scale: 1.25, duration: 0.3, ease: "power2.out" },
+          0.73
         )
 
-        // 3. Card transition: Broto fades out, Árvore fades in
+        // 3. Card transition: Stage 1 slides out, Stage 2 slides in
         pinTl.to(
-          ".card-stage-1",
-          { opacity: 0, y: -20, duration: 0.4, ease: "power2.in" },
-          0.65
-        )
-        pinTl.fromTo(
-          ".card-stage-2",
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.5, ease: "power2.out" },
-          0.85
+          ".pilar-card-stage-1",
+          {
+            opacity: 0,
+            y: -20,
+            duration: 0.25,
+            ease: "power2.in",
+            onComplete: () => {
+              const el = document.querySelector(".pilar-card-stage-1") as HTMLElement
+              if (el) el.style.display = "none"
+            },
+          },
+          0.68
         )
 
-        // 4. Draw Árvore SVG icon
+        pinTl.set(
+          ".pilar-card-stage-2",
+          { display: "flex" },
+          0.73
+        )
+
+        pinTl.fromTo(
+          ".pilar-card-stage-2",
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: 0.35, ease: "power2.out" },
+          0.74
+        )
+
+        // 4. Draw Árvore SVG line icon
         iconPaths[2].forEach((p) => {
           pinTl.to(
             p,
-            { strokeDashoffset: 0, duration: 0.5, ease: "power2.out" },
-            0.9
+            { strokeDashoffset: 0, duration: 0.4, ease: "power2.out" },
+            0.76
           )
         })
+
+        // =============================================================
+        // ZONE 3: ÁRVORE IS HELD AT REST (0.80 to 1.00)
+        // Ample scroll distance for reading Stage 3 before unpinning
+        // =============================================================
       }
 
-      // -------------------------------------------------------------
-      // MOBILE: UNPINNED STACK WITH INDEPENDENT TRIGGERS
-      // -------------------------------------------------------------
+      // =============================================================
+      // MOBILE: NATURAL DOCUMENT FLOW (NO PINNING, ZERO GLITCH)
+      // =============================================================
       if (isMobile) {
         if (mobileStemRef.current) {
           const mLen = mobileStemRef.current.getTotalLength()
@@ -254,15 +298,15 @@ export const Pilares: React.FC = () => {
               trigger: section,
               start: "top 70%",
               end: "bottom 85%",
-              scrub: 0.3,
+              scrub: 0.4,
             },
           })
         }
 
-        gsap.utils.toArray<HTMLElement>(".mobile-pilar-item").forEach((item, idx) => {
+        gsap.utils.toArray<HTMLElement>(".mobile-pilar-card").forEach((item, idx) => {
           gsap.fromTo(
             item,
-            { opacity: 0.25, y: 25 },
+            { opacity: 0.2, y: 25 },
             {
               opacity: 1,
               y: 0,
@@ -305,15 +349,15 @@ export const Pilares: React.FC = () => {
     <section
       ref={sectionRef}
       id="pilares"
-      className="relative z-20 w-full min-h-screen lg:h-screen bg-wd-dark-blue text-white border-t border-white/10 flex flex-col justify-between overflow-hidden"
+      className="relative z-20 w-full min-h-screen lg:h-screen bg-wd-dark-blue text-white border-t border-white/10 flex flex-col justify-between overflow-hidden pt-20 lg:pt-24 pb-8"
     >
       {/* =============================================================
-          DESKTOP PINNED VIEW (~200vh scroll)
+          DESKTOP PINNED VIEW (~360vh scroll distance for calm pacing)
           ============================================================= */}
       {!isMobile ? (
-        <div className="relative w-full h-full max-w-[1360px] mx-auto px-6 md:px-12 lg:px-16 flex flex-col justify-between py-10 lg:py-12">
+        <div className="relative w-full h-full max-w-[1360px] mx-auto px-6 md:px-12 lg:px-16 flex flex-col justify-between py-4">
           
-          {/* Header */}
+          {/* Section Header */}
           <div className="w-full max-w-2xl shrink-0">
             <span className="font-sans text-xs uppercase tracking-[0.25em] text-wd-orange font-semibold block mb-1.5">
               O que sustenta a candidatura
@@ -326,16 +370,16 @@ export const Pilares: React.FC = () => {
             </p>
           </div>
 
-          {/* Main Stage Grid: Left Stem Stepper (5 cols) + Right Card (7 cols) */}
-          <div className="grid grid-cols-12 gap-8 lg:gap-14 items-center my-auto py-4">
+          {/* Main Stage: Left Stem Journey (5 cols) + Right Focused Card (7 cols) */}
+          <div className="grid grid-cols-12 gap-8 lg:gap-14 items-center my-auto py-2">
             
             {/* -------------------------------------------------------------
-                LEFT COLUMN: Continuous Caule (Stem) with 3 Stage Milestones
+                LEFT COLUMN: Continuous Caule (Stem) with 3 Milestones
                 ------------------------------------------------------------- */}
             <div className="col-span-5 flex items-center justify-start relative pl-2">
               <div className="relative w-full max-w-[340px] h-[340px] flex items-center">
                 
-                {/* SVG Stem running through the 3 nodes */}
+                {/* SVG Stem line running through the 3 milestones */}
                 <svg
                   className="absolute left-6 top-0 w-8 h-full overflow-visible pointer-events-none"
                   viewBox="0 0 32 340"
@@ -348,17 +392,17 @@ export const Pilares: React.FC = () => {
                     strokeWidth="2"
                     strokeDasharray="4 4"
                   />
-                  {/* Active drawing stem (DrawSVG scrub) */}
+                  {/* Drawing stem synchronized with scroll */}
                   <path
                     ref={stemPathRef}
                     d="M 16 30 L 16 310"
                     stroke="#F26F22"
-                    strokeWidth="3"
+                    strokeWidth="3.5"
                     strokeLinecap="round"
                   />
                 </svg>
 
-                {/* 3 Milestones stacked along the stem */}
+                {/* 3 Milestones stacked vertically along the stem */}
                 <div className="relative z-10 w-full h-full flex flex-col justify-between py-2">
                   {PILARES_DATA.map((pilar, idx) => (
                     <div
@@ -375,7 +419,7 @@ export const Pilares: React.FC = () => {
                             idx === 0 ? "opacity-100 scale-125" : "opacity-0 scale-90"
                           } transition-all`}
                         />
-                        {/* Center dot */}
+                        {/* Center core dot */}
                         <div className="w-3.5 h-3.5 rounded-full bg-wd-orange shadow-[0_0_12px_rgba(242,111,34,0.6)]" />
                       </div>
 
@@ -396,13 +440,13 @@ export const Pilares: React.FC = () => {
             </div>
 
             {/* -------------------------------------------------------------
-                RIGHT COLUMN: Premium Interactive Card ("No card que a gente começa")
+                RIGHT COLUMN: Premium Focused Card ("No card que a gente começa")
                 ------------------------------------------------------------- */}
             <div className="col-span-7 relative">
-              <div className="relative w-full bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-[0.25rem] p-8 sm:p-10 lg:p-12 shadow-2xl overflow-hidden min-h-[380px] flex flex-col justify-between">
+              <div className="relative w-full bg-wd-deep-blue/80 backdrop-blur-xl border border-white/15 rounded-[0.5rem] p-8 sm:p-10 lg:p-12 shadow-2xl overflow-hidden min-h-[400px] flex flex-col justify-between">
                 
                 {/* Stage 1: SEMENTE */}
-                <div className="card-stage-0 absolute inset-0 p-8 sm:p-10 lg:p-12 flex flex-col justify-between opacity-100 will-change-[transform,opacity]">
+                <div className="pilar-card-stage-0 w-full flex-col justify-between will-change-[transform,opacity]">
                   <div>
                     {/* Top Row: Icon + Badge + Progress */}
                     <div className="flex items-center justify-between pb-6 border-b border-white/10">
@@ -410,18 +454,18 @@ export const Pilares: React.FC = () => {
                         <div className="w-12 h-12 flex items-center justify-center">
                           <svg className="w-11 h-11" viewBox="0 0 48 48" fill="none">
                             <path
-                              className="card-icon-path-0"
+                              className="pilar-card-icon-0"
                               d="M 24 8 C 16 16 13 26 13 33 C 13 40 18 44 24 44 C 30 44 35 40 35 33 C 35 26 32 16 24 8 Z"
                               stroke="#F26F22"
-                              strokeWidth="2"
+                              strokeWidth="2.2"
                               strokeLinecap="round"
                               strokeLinejoin="round"
                             />
                             <path
-                              className="card-icon-path-0"
+                              className="pilar-card-icon-0"
                               d="M 24 20 L 24 38 M 24 28 C 28 26 30 22 30 22"
                               stroke="#F26F22"
-                              strokeWidth="1.75"
+                              strokeWidth="1.8"
                               strokeLinecap="round"
                             />
                           </svg>
@@ -430,7 +474,7 @@ export const Pilares: React.FC = () => {
                           Estágio: Semente
                         </span>
                       </div>
-                      <span className="font-condensed font-bold text-sm tracking-widest text-white/40 tabular-nums">
+                      <span className="font-condensed font-bold text-sm tracking-widest text-white/50 tabular-nums">
                         01 / 03
                       </span>
                     </div>
@@ -446,16 +490,18 @@ export const Pilares: React.FC = () => {
                     </p>
                   </div>
 
-                  {/* Progress indicator */}
-                  <div className="w-full pt-6">
-                    <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div className="w-1/3 h-full bg-wd-orange rounded-full" />
+                  {/* Segmented Progress Bar */}
+                  <div className="w-full pt-8">
+                    <div className="grid grid-cols-3 gap-2 w-full">
+                      <div className="h-1.5 rounded-full bg-wd-orange transition-all duration-300 shadow-[0_0_8px_rgba(242,111,34,0.5)]" />
+                      <div className="h-1.5 rounded-full bg-white/10" />
+                      <div className="h-1.5 rounded-full bg-white/10" />
                     </div>
                   </div>
                 </div>
 
                 {/* Stage 2: BROTO */}
-                <div className="card-stage-1 absolute inset-0 p-8 sm:p-10 lg:p-12 flex flex-col justify-between opacity-0 will-change-[transform,opacity] pointer-events-none">
+                <div className="pilar-card-stage-1 w-full flex-col justify-between will-change-[transform,opacity]" style={{ display: "none" }}>
                   <div>
                     {/* Top Row: Icon + Badge + Progress */}
                     <div className="flex items-center justify-between pb-6 border-b border-white/10">
@@ -463,18 +509,18 @@ export const Pilares: React.FC = () => {
                         <div className="w-12 h-12 flex items-center justify-center">
                           <svg className="w-11 h-11" viewBox="0 0 48 48" fill="none">
                             <path
-                              className="card-icon-path-1"
+                              className="pilar-card-icon-1"
                               d="M 24 44 L 24 16 C 24 12 18 10 12 12 C 10 18 14 24 24 24 C 34 24 38 18 36 12 C 30 10 24 12 24 16"
                               stroke="#F26F22"
-                              strokeWidth="2"
+                              strokeWidth="2.2"
                               strokeLinecap="round"
                               strokeLinejoin="round"
                             />
                             <path
-                              className="card-icon-path-1"
+                              className="pilar-card-icon-1"
                               d="M 18 16 C 21 13 24 13 24 13 C 24 13 27 13 30 16"
                               stroke="#F26F22"
-                              strokeWidth="1.5"
+                              strokeWidth="1.8"
                               strokeLinecap="round"
                             />
                           </svg>
@@ -483,7 +529,7 @@ export const Pilares: React.FC = () => {
                           Estágio: Broto
                         </span>
                       </div>
-                      <span className="font-condensed font-bold text-sm tracking-widest text-white/40 tabular-nums">
+                      <span className="font-condensed font-bold text-sm tracking-widest text-white/50 tabular-nums">
                         02 / 03
                       </span>
                     </div>
@@ -494,7 +540,7 @@ export const Pilares: React.FC = () => {
                     </h3>
 
                     {/* Prominent Display Highlight */}
-                    <p className="font-condensed font-black uppercase text-2xl sm:text-3xl lg:text-4xl text-wd-orange tracking-tight leading-tight my-2 [text-wrap:balance]">
+                    <p className="font-condensed font-black uppercase text-2xl sm:text-3xl lg:text-4xl text-wd-orange tracking-tight leading-tight my-3 [text-wrap:balance]">
                       “O Nortão precisa ser ouvido.”
                     </p>
 
@@ -504,16 +550,18 @@ export const Pilares: React.FC = () => {
                     </p>
                   </div>
 
-                  {/* Progress indicator */}
-                  <div className="w-full pt-6">
-                    <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div className="w-2/3 h-full bg-wd-orange rounded-full" />
+                  {/* Segmented Progress Bar */}
+                  <div className="w-full pt-8">
+                    <div className="grid grid-cols-3 gap-2 w-full">
+                      <div className="h-1.5 rounded-full bg-wd-orange/50" />
+                      <div className="h-1.5 rounded-full bg-wd-orange transition-all duration-300 shadow-[0_0_8px_rgba(242,111,34,0.5)]" />
+                      <div className="h-1.5 rounded-full bg-white/10" />
                     </div>
                   </div>
                 </div>
 
                 {/* Stage 3: ÁRVORE */}
-                <div className="card-stage-2 absolute inset-0 p-8 sm:p-10 lg:p-12 flex flex-col justify-between opacity-0 will-change-[transform,opacity] pointer-events-none">
+                <div className="pilar-card-stage-2 w-full flex-col justify-between will-change-[transform,opacity]" style={{ display: "none" }}>
                   <div>
                     {/* Top Row: Icon + Badge + Progress */}
                     <div className="flex items-center justify-between pb-6 border-b border-white/10">
@@ -521,25 +569,25 @@ export const Pilares: React.FC = () => {
                         <div className="w-12 h-12 flex items-center justify-center">
                           <svg className="w-11 h-11" viewBox="0 0 48 48" fill="none">
                             <path
-                              className="card-icon-path-2"
+                              className="pilar-card-icon-2"
                               d="M 24 44 L 24 24 M 24 32 L 18 24 M 24 28 L 30 20"
                               stroke="#F26F22"
-                              strokeWidth="2"
+                              strokeWidth="2.2"
                               strokeLinecap="round"
                             />
                             <path
-                              className="card-icon-path-2"
+                              className="pilar-card-icon-2"
                               d="M 24 24 C 15 24 11 16 16 10 C 21 4 25 8 24 12 C 26 6 34 6 36 12 C 41 14 39 24 24 24 Z"
                               stroke="#F26F22"
-                              strokeWidth="2"
+                              strokeWidth="2.2"
                               strokeLinecap="round"
                               strokeLinejoin="round"
                             />
                             <path
-                              className="card-icon-path-2"
+                              className="pilar-card-icon-2"
                               d="M 19 44 C 22 41 24 41 24 44 C 24 41 26 41 29 44"
                               stroke="#F26F22"
-                              strokeWidth="1.5"
+                              strokeWidth="1.8"
                               strokeLinecap="round"
                             />
                           </svg>
@@ -548,7 +596,7 @@ export const Pilares: React.FC = () => {
                           Estágio: Árvore
                         </span>
                       </div>
-                      <span className="font-condensed font-bold text-sm tracking-widest text-white/40 tabular-nums">
+                      <span className="font-condensed font-bold text-sm tracking-widest text-white/50 tabular-nums">
                         03 / 03
                       </span>
                     </div>
@@ -564,10 +612,12 @@ export const Pilares: React.FC = () => {
                     </p>
                   </div>
 
-                  {/* Progress indicator */}
-                  <div className="w-full pt-6">
-                    <div className="w-full h-1 bg-white/10 rounded-full overflow-hidden">
-                      <div className="w-full h-full bg-wd-orange rounded-full" />
+                  {/* Segmented Progress Bar */}
+                  <div className="w-full pt-8">
+                    <div className="grid grid-cols-3 gap-2 w-full">
+                      <div className="h-1.5 rounded-full bg-wd-orange/50" />
+                      <div className="h-1.5 rounded-full bg-wd-orange/50" />
+                      <div className="h-1.5 rounded-full bg-wd-orange transition-all duration-300 shadow-[0_0_8px_rgba(242,111,34,0.5)]" />
                     </div>
                   </div>
                 </div>
@@ -578,7 +628,7 @@ export const Pilares: React.FC = () => {
           </div>
 
           {/* Bottom Bar Indicator */}
-          <div className="w-full flex justify-between items-center text-xs text-white/40 font-sans uppercase tracking-widest pt-4 border-t border-white/5 shrink-0">
+          <div className="w-full flex justify-between items-center text-xs text-white/40 font-sans uppercase tracking-widest pt-3 border-t border-white/5 shrink-0">
             <span>Pilares de Mandato</span>
             <span>Mato Grosso 2026</span>
           </div>
@@ -586,9 +636,9 @@ export const Pilares: React.FC = () => {
         </div>
       ) : (
         /* =============================================================
-           MOBILE VIEW (STACKED WITHOUT PIN)
+           MOBILE VIEW (STACKED CARDS WITHOUT PIN)
            ============================================================= */
-        <div className="w-full px-6 py-16 flex flex-col gap-10">
+        <div className="w-full px-6 py-12 flex flex-col gap-10">
           {/* Header */}
           <div>
             <span className="font-sans text-xs uppercase tracking-[0.25em] text-wd-orange font-semibold block mb-1.5">
@@ -603,7 +653,7 @@ export const Pilares: React.FC = () => {
           </div>
 
           {/* Stacked Pillars with Left Continuous Stem */}
-          <div className="relative pl-8 flex flex-col gap-12">
+          <div className="relative pl-8 flex flex-col gap-8">
             {/* Continuous SVG Stem */}
             <div className="absolute left-2.5 top-2 bottom-4 w-1">
               <svg className="w-4 h-full overflow-visible" preserveAspectRatio="none">
@@ -626,43 +676,48 @@ export const Pilares: React.FC = () => {
             {PILARES_DATA.map((pilar, index) => (
               <div
                 key={pilar.id}
-                className="mobile-pilar-item relative flex flex-col gap-2 pt-2 bg-white/[0.02] border border-white/10 rounded-[0.25rem] p-6"
+                className="mobile-pilar-card relative flex flex-col gap-3 bg-wd-deep-blue/80 backdrop-blur-md border border-white/15 rounded-[0.5rem] p-6 shadow-xl"
               >
-                {/* Node circle */}
-                <div className="absolute -left-[2.35rem] top-8 w-3.5 h-3.5 rounded-full bg-wd-orange border-2 border-wd-dark-blue shadow" />
+                {/* Node circle on stem */}
+                <div className="absolute -left-[2.35rem] top-8 w-3.5 h-3.5 rounded-full bg-wd-orange border-2 border-wd-dark-blue shadow-[0_0_8px_rgba(242,111,34,0.6)]" />
 
                 {/* Handcrafted Icon */}
-                <div className="w-10 h-10 mb-1">
-                  {index === 0 && (
-                    <svg className="w-9 h-9" viewBox="0 0 48 48" fill="none">
-                      <path
-                        className="mobile-icon-path-0"
-                        d="M 24 8 C 16 16 13 26 13 33 C 13 40 18 44 24 44 C 30 44 35 40 35 33 C 35 26 32 16 24 8 Z"
-                        stroke="#F26F22"
-                        strokeWidth="2"
-                      />
-                    </svg>
-                  )}
-                  {index === 1 && (
-                    <svg className="w-9 h-9" viewBox="0 0 48 48" fill="none">
-                      <path
-                        className="mobile-icon-path-1"
-                        d="M 24 44 L 24 16 C 24 12 18 10 12 12 C 10 18 14 24 24 24 C 34 24 38 18 36 12 C 30 10 24 12 24 16"
-                        stroke="#F26F22"
-                        strokeWidth="2"
-                      />
-                    </svg>
-                  )}
-                  {index === 2 && (
-                    <svg className="w-9 h-9" viewBox="0 0 48 48" fill="none">
-                      <path
-                        className="mobile-icon-path-2"
-                        d="M 24 44 L 24 24 M 24 32 L 18 24 M 24 28 L 30 20 M 24 24 C 15 24 11 16 16 10 C 21 4 25 8 24 12 C 26 6 34 6 36 12 C 41 14 39 24 24 24 Z"
-                        stroke="#F26F22"
-                        strokeWidth="2"
-                      />
-                    </svg>
-                  )}
+                <div className="flex items-center justify-between">
+                  <div className="w-10 h-10">
+                    {index === 0 && (
+                      <svg className="w-9 h-9" viewBox="0 0 48 48" fill="none">
+                        <path
+                          className="mobile-icon-path-0"
+                          d="M 24 8 C 16 16 13 26 13 33 C 13 40 18 44 24 44 C 30 44 35 40 35 33 C 35 26 32 16 24 8 Z"
+                          stroke="#F26F22"
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    )}
+                    {index === 1 && (
+                      <svg className="w-9 h-9" viewBox="0 0 48 48" fill="none">
+                        <path
+                          className="mobile-icon-path-1"
+                          d="M 24 44 L 24 16 C 24 12 18 10 12 12 C 10 18 14 24 24 24 C 34 24 38 18 36 12 C 30 10 24 12 24 16"
+                          stroke="#F26F22"
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    )}
+                    {index === 2 && (
+                      <svg className="w-9 h-9" viewBox="0 0 48 48" fill="none">
+                        <path
+                          className="mobile-icon-path-2"
+                          d="M 24 44 L 24 24 M 24 32 L 18 24 M 24 28 L 30 20 M 24 24 C 15 24 11 16 16 10 C 21 4 25 8 24 12 C 26 6 34 6 36 12 C 41 14 39 24 24 24 Z"
+                          stroke="#F26F22"
+                          strokeWidth="2"
+                        />
+                      </svg>
+                    )}
+                  </div>
+                  <span className="font-condensed font-bold text-xs tracking-widest text-white/40 tabular-nums">
+                    0{index + 1} / 03
+                  </span>
                 </div>
 
                 <span className="font-sans text-xs uppercase tracking-[0.25em] text-wd-orange font-semibold">
